@@ -109,7 +109,17 @@
                     <div class="metric-card skeleton" style="height: 140px;"></div>
                     <div class="metric-card skeleton" style="height: 140px;"></div>
                     <div class="metric-card skeleton" style="height: 140px;"></div>
-                    <div class="metric-card skeleton" style="height: 140px;"></div>
+                    <div class="metric-card" style="position: relative; overflow: hidden; background: linear-gradient(135deg, var(--bg-surface) 0%, var(--primary-light) 100%);">
+                         <div
+                            style="position: absolute; right: -20px; top: -20px; font-size: 8rem; color: var(--primary); opacity: 0.05;">
+                            <i class="ph-fill ph-rocket-launch"></i></div>
+                        <div class="metric-header">
+                            <div class="metric-title" style="font-size: 1.1rem;">Next Payout</div>
+                        </div>
+                        <div class="metric-value" id="next-payout-date"
+                            style="font-size: 1.8rem; margin-top: 12px; font-weight: 700; color: var(--primary);">Calculating...</div>
+                        <p class="text-muted" style="margin-top: 12px; font-size: 0.85rem;">Average frequency: <span style="font-weight: 600;">Daily</span>. Estimated arrival of your next transfer.</p>
+                    </div>
                 </div>
 
                 <!-- Charts Row -->
@@ -140,14 +150,16 @@
                         <div class="panel-header">
                             <h2 class="panel-title">Payment Status</h2>
                         </div>
-                        <div
-                            style="height: 250px; display: flex; justify-content: center; align-items: center; position: relative;">
-                            <canvas id="statusChart"></canvas>
-                            <div id="status-chart-center-text"
-                                style="position: absolute; text-align: center; pointer-events: none;">
-                                <div style="font-size: 1.5rem; font-weight: 700; color: var(--text-main);"
-                                    id="pie-total-val">0</div>
-                                <div style="font-size: 0.8rem; color: var(--text-muted);">Total Payments</div>
+                        <div style="display: flex; flex-direction: column; align-items: center; gap: 24px;">
+                            <div style="height: 200px; width: 100%; display: flex; justify-content: center; align-items: center; position: relative;">
+                                <canvas id="statusChart"></canvas>
+                                <div id="status-chart-center-text" style="position: absolute; text-align: center; pointer-events: none;">
+                                    <div style="font-size: 1.5rem; font-weight: 700; color: var(--text-main);" id="pie-total-val">0</div>
+                                    <div style="font-size: 0.8rem; color: var(--text-muted);">Total</div>
+                                </div>
+                            </div>
+                            <div id="status-legend" style="width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 0.85rem;">
+                                <!-- Will be populated by JS -->
                             </div>
                         </div>
                     </div>

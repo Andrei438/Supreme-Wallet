@@ -23,10 +23,20 @@
             <nav class="sidebar-nav">
                 <a href="index.html" class="nav-item" data-tooltip="Overview"><i class="ph ph-squares-four"></i>
                     <span>Overview</span></a>
-                <a href="transactions.html" class="nav-item active" data-tooltip="Transactions"><i
+                <a href="transactions.html" class="nav-item" data-tooltip="Transactions"><i
                         class="ph ph-arrows-left-right"></i> <span>Transactions</span></a>
-                <a href="customers.html" class="nav-item" data-tooltip="Customers"><i class="ph ph-users"></i>
+                <a href="customers.html" class="nav-item active" data-tooltip="Customers"><i class="ph ph-users"></i>
                     <span>Customers</span></a>
+                <a href="balance.html" class="nav-item" data-tooltip="Balance & Payouts"><i class="ph ph-scales"></i>
+                    <span>Balance & Payouts</span></a>
+                <a href="refunds.html" class="nav-item" data-tooltip="Refunds"><i class="ph ph-arrow-u-down-left"></i>
+                    <span>Refunds</span></a>
+                <a href="disputes.html" class="nav-item" data-tooltip="Disputes"><i class="ph ph-warning-octagon"></i>
+                    <span>Disputes</span></a>
+                <a href="events.html" class="nav-item" data-tooltip="Stripe Events"><i class="ph ph-bell-ringing"></i>
+                    <span>Stripe Events</span></a>
+                <a href="analytics.html" class="nav-item" data-tooltip="Analytics"><i class="ph ph-chart-line-up"></i>
+                    <span>Analytics</span></a>
             </nav>
             <div class="sidebar-footer">
                 <a href="settings.html" class="nav-item" data-tooltip="Settings"><i class="ph ph-gear"></i>
@@ -83,20 +93,20 @@
 
                 <div class="panel">
                     <!-- Advanced Filters Panel -->
-                    <div class="panel-header" style="flex-wrap: wrap; gap: 16px;">
-                        <div style="display: flex; gap: 12px; flex-wrap: wrap; flex: 1;">
-                            <div style="position: relative; max-width: 300px; flex: 1;">
+                    <div class="panel-header" style="flex-wrap: wrap; gap: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 0;">
+                        <div class="tabs" id="status-tabs" style="border: none; margin: 0; gap: 4px;">
+                            <button class="tab-item active" data-status="">All</button>
+                            <button class="tab-item" data-status="succeeded">Succeeded</button>
+                            <button class="tab-item" data-status="requires_payment_method">Pending</button>
+                            <button class="tab-item" data-status="canceled">Failed</button>
+                        </div>
+                        <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center; padding-bottom: 16px;">
+                            <div style="position: relative; width: 250px;">
                                 <i class="ph ph-magnifying-glass text-muted"
                                     style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%);"></i>
                                 <input type="text" id="search-input" class="form-control"
-                                    placeholder="Search by email, name, or last4..." style="padding-left: 36px;">
+                                    placeholder="Search payments..." style="padding-left: 36px;">
                             </div>
-                            <select id="status-filter" class="form-control" style="width: 160px;">
-                                <option value="">All Statuses</option>
-                                <option value="succeeded">Succeeded</option>
-                                <option value="canceled">Canceled / Failed</option>
-                                <option value="requires_payment_method">Requires Payment</option>
-                            </select>
                         </div>
                     </div>
 

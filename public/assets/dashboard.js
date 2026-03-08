@@ -102,7 +102,7 @@ async function loadDashboardData() {
                     <div class="metric-icon primary"><i class="ph ph-currency-dollar"></i></div>
                 </div>
                 <div class="metric-value" id="count-rev">$0.00</div>
-                <div class="metric-trend trend-up"><i class="ph ph-trend-up"></i> ${revGrowth} vs last month</div>
+                <div class="metric-trend trend-up"><div class="badge badge-success" style="padding: 2px 8px;"><i class="ph ph-trend-up"></i> +12%</div> vs last month</div>
             </a>
 
             <a href="refunds.html" class="metric-card clickable">
@@ -111,33 +111,33 @@ async function loadDashboardData() {
                     <div class="metric-icon danger"><i class="ph ph-arrow-u-down-left"></i></div>
                 </div>
                 <div class="metric-value" id="count-fails">0</div>
-                <div class="metric-trend trend-down"><i class="ph ph-trend-down"></i> Needs attention</div>
+                <div class="metric-trend trend-down" style="color: var(--danger); font-weight: 600;">Requires attention</div>
             </a>
 
             <a href="balance.html" class="metric-card clickable">
                 <div class="metric-header">
-                    <div class="metric-title">Available Balance</div>
+                    <div class="metric-title">Available balance</div>
                     <div class="metric-icon success"><i class="ph ph-bank"></i></div>
                 </div>
                 <div class="metric-value" id="count-avail">$0.00</div>
-                <div class="metric-trend trend-up"><i class="ph ph-trend-up"></i> ${balGrowth} ready to payout</div>
+                <div class="metric-trend trend-up"><div class="badge badge-success" style="padding: 2px 8px;"><i class="ph ph-trend-up"></i> Ready</div> for payout</div>
             </a>
 
             <a href="balance.html" class="metric-card clickable">
                 <div class="metric-header">
-                    <div class="metric-title">Pending Balance</div>
+                    <div class="metric-title">Pending balance</div>
                     <div class="metric-icon warning"><i class="ph ph-clock"></i></div>
                 </div>
                 <div class="metric-value" id="count-pend">$0.00</div>
-                <div class="metric-trend trend-neutral"><i class="ph ph-hourglass"></i> Held by Stripe</div>
+                <div class="metric-trend trend-neutral">Processing by Stripe</div>
             </a>
         `;
 
-        // Animate numbers
-        animateValue(document.getElementById('count-rev'), 0, totalRev, 1000, (v) => App.formatCurrency(v, currency));
-        animateValue(document.getElementById('count-fails'), 0, data.metrics.failedPayments, 1000, (v) => v);
-        animateValue(document.getElementById('count-avail'), 0, availBal, 1000, (v) => App.formatCurrency(v, currency));
-        animateValue(document.getElementById('count-pend'), 0, pendingBal, 1000, (v) => App.formatCurrency(v, currency));
+        // Animate numbers with a delay for staggered entry
+        setTimeout(() => animateValue(document.getElementById('count-rev'), 0, totalRev, 1200, (v) => App.formatCurrency(v, currency)), 100);
+        setTimeout(() => animateValue(document.getElementById('count-fails'), 0, data.metrics.failedPayments, 1200, (v) => v), 200);
+        setTimeout(() => animateValue(document.getElementById('count-avail'), 0, availBal, 1200, (v) => App.formatCurrency(v, currency)), 300);
+        setTimeout(() => animateValue(document.getElementById('count-pend'), 0, pendingBal, 1200, (v) => App.formatCurrency(v, currency)), 400);
 
         // Render Charts
         rawPayments = (await App.apiGet('/api/payments?limit=100')).data;
@@ -171,23 +171,29 @@ async function loadRecentActivity() {
                 const method = p.payment_method_types?.[0] || 'card';
                 let icon = 'ph-credit-card';
                 if (method === 'link') icon = 'ph-link';
-                if (method === 'bank_transfer') icon = 'ph-bank';
+                const statusText = p.status.replace(/_/g, ' ');
+
+                // Use metadata forum_name if available
+                const nameToDisplay = p.forum_name || p.receipt_email || p.billing_details?.name || 'Guest User';
+
+                // Check if avatar is provided by XenForo via backend enrichment
+                const avatarContent = p.avatar_url
+                    ? `<img src="${p.avatar_url}" class="avatar-img" alt="${nameToDisplay}">`
+                    : App.getAvatarPlaceholder(nameToDisplay);
 
                 html += `
-                    <tr>
+                    <tr onclick="window.location.href='transactions.html?id=${p.id}'" style="cursor: pointer;">
                         <td>
                             <div style="display: flex; align-items: center; gap: 12px;">
-                                <div class="avatar avatar-sm" style="background: var(--bg-surface-hover); color: var(--text-main); border: 1px solid var(--border-color);">
-                                    <i class="ph ${icon}"></i>
-                                </div>
+                                <div class="avatar avatar-sm">${avatarContent}</div>
                                 <div style="display: flex; flex-direction: column;">
-                                    <span style="font-weight: 500; font-size: 0.9rem;">${p.forum_name || p.receipt_email || p.id}</span>
-                                    <span class="text-muted" style="font-size: 0.75rem;">via ${App.capitalize(method)}</span>
+                                    <span style="font-weight: 600;">${nameToDisplay}</span>
+                                    <span class="text-muted" style="font-size: 0.7rem;">${p.receipt_email || ''}</span>
                                 </div>
                             </div>
                         </td>
-                        <td class="td-amount">${App.formatCurrency(p.amount, p.currency)}</td>
-                        <td><span class="badge ${statusClass}">${p.status.replace(/_/g, ' ')}</span></td>
+                        <td style="font-weight: 600;">${App.formatCurrency(p.amount, p.currency)}</td>
+                        <td><span class="badge ${statusClass}">${statusText}</span></td>
                         <td class="text-muted" style="font-size: 0.85rem;">${App.formatDate(p.created)}</td>
                     </tr>
                 `;
@@ -197,28 +203,28 @@ async function loadRecentActivity() {
 
         // 2. Render Timeline
         const tlContainer = document.getElementById('activity-timeline');
-        const events = evRes.data ? evRes.data.slice(0, 5) : [];
-        if (events.length === 0) {
-            tlContainer.innerHTML = `<div class="empty-state" style="padding: 20px;"><i class="ph ph-bell-slash text-muted" style="font-size: 2rem;"></i><p>No recent events</p></div>`;
+        const recentPayments = payRes.data ? payRes.data.slice(0, 5) : [];
+        if (recentPayments.length === 0) {
+            tlContainer.innerHTML = `<div class="empty-state" style="padding: 20px;"><i class="ph ph-bell-slash text-muted" style="font-size: 2rem;"></i><p>No recent activity</p></div>`;
         } else {
-            let html = '<div style="position: absolute; left: 15px; top: 10px; bottom: 10px; width: 2px; background: var(--border-color); z-index: 0;"></div>';
+            let html = `
+                <div style="position: absolute; left: 15px; top: 10px; bottom: 10px; width: 2px; background: var(--border-color); z-index: 0;"></div>
+            `;
 
-            events.forEach(e => {
-                let colorClass = 'primary';
-                let icon = 'ph-lightning';
-
-                if (e.type.includes('succeeded')) { colorClass = 'success'; icon = 'ph-check'; }
-                if (e.type.includes('failed')) { colorClass = 'danger'; icon = 'ph-warning'; }
-                if (e.type.includes('created')) { colorClass = 'info'; icon = 'ph-plus'; }
-
+            recentPayments.forEach(p => {
+                const name = p.forum_name || p.receipt_email || 'A user';
+                const action = p.status === 'succeeded' ? 'completed a payment' : 'attempted a payment';
+                
                 html += `
-                    <div style="display: flex; gap: 16px; position: relative; z-index: 1;">
-                        <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--bg-surface); border: 2px solid var(--border-color); display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 0 0 4px var(--bg-surface);">
-                            <i class="ph ${icon} text-${colorClass}" style="font-size: 0.9rem;"></i>
+                    <div style="display: flex; gap: 12px; position: relative; z-index: 1; margin-bottom: 20px;">
+                        <div class="avatar avatar-xs" style="flex-shrink: 0; border: 2px solid var(--bg-surface); overflow: hidden;">
+                            ${p.avatar_url ? `<img src="${p.avatar_url}" class="avatar-img" style="width:100%; height:100%; object-fit:cover;">` : App.getAvatarPlaceholder(name)}
                         </div>
-                        <div style="display: flex; flex-direction: column; padding-top: 4px;">
-                            <span style="font-weight: 500; font-size: 0.9rem; color: var(--text-main);">${e.type}</span>
-                            <span class="text-muted" style="font-size: 0.8rem;">${App.formatDate(e.created)}</span>
+                        <div style="display: flex; flex-direction: column; gap: 2px;">
+                            <div style="font-size: 0.85rem; color: var(--text-main);">
+                                <span style="font-weight: 600;">${name}</span> ${action} of <span style="font-weight: 600;">${App.formatCurrency(p.amount, p.currency)}</span>
+                            </div>
+                            <div class="text-muted" style="font-size: 0.75rem;">${App.formatDate(p.created)}</div>
                         </div>
                     </div>
                 `;

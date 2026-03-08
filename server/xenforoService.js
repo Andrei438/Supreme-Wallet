@@ -12,19 +12,19 @@ async function getRedis() {
 }
 
 /**
- * Fetches a XenForo username by email address.
- * Integrates with Redis for 24-hour caching to ensure top performance.
+ * Fetches XenForo user info (username, avatar) by email address.
+ * Integrates with Redis for 24-hour caching.
  */
-async function getUsernameByEmail(email) {
+async function getUserInfoByEmail(email) {
     if (!email || !config.xenforoApiUrl || !config.xenforoApiKey) return null;
 
-    const cacheKey = `xf_user:${email.toLowerCase()}`;
+    const cacheKey = `xf_user_v2:${email.toLowerCase()}`;
     const redis = await getRedis();
 
     try {
         // 1. Check Cache
         const cached = await redis.get(cacheKey);
-        if (cached) return cached;
+        if (cached) return JSON.parse(cached);
 
         // 2. Fetch from XenForo API
         const url = new URL(`${config.xenforoApiUrl}/api/users/find`);
@@ -41,17 +41,23 @@ async function getUsernameByEmail(email) {
         }
         
         const data = await response.json();
-        const username = data?.user?.username || null;
-
-        // 3. Cache Result (24 hrs)
-        if (username) {
-            await redis.set(cacheKey, username, { EX: 86400 });
-        } else {
-            // Cache negative results for a shorter time to avoid repeated failed lookups
-            await redis.set(cacheKey, 'UNKNOWN', { EX: 3600 });
+        const user = data?.user;
+        
+        if (!user) {
+            await redis.set(cacheKey, JSON.stringify({ error: 'UNKNOWN' }), { EX: 3600 });
+            return null;
         }
 
-        return username;
+        const userInfo = {
+            username: user.username,
+            avatar_url: user.avatar_urls?.o || user.avatar_urls?.h || user.avatar_urls?.m || user.avatar_urls?.s || null,
+            user_id: user.user_id
+        };
+
+        // 3. Cache Result (24 hrs)
+        await redis.set(cacheKey, JSON.stringify(userInfo), { EX: 86400 });
+
+        return userInfo;
     } catch (error) {
         console.error(`[XenForo Service] Lookup failed for ${email}:`, error.message);
         return null;
@@ -59,5 +65,5 @@ async function getUsernameByEmail(email) {
 }
 
 module.exports = {
-    getUsernameByEmail
+    getUserInfoByEmail
 };

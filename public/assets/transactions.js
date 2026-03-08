@@ -24,7 +24,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Event Listeners
     document.getElementById('search-input').addEventListener('input', renderTransactions);
-    document.getElementById('status-filter').addEventListener('change', renderTransactions);
+    
+    // Status Tabs Filter
+    const statusTabs = document.querySelectorAll('#status-tabs .tab-item');
+    statusTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            statusTabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            renderTransactions();
+        });
+    });
+
     document.getElementById('export-btn').addEventListener('click', exportCSV);
 
     document.getElementById('confirm-refund-btn').addEventListener('click', processRefund);
@@ -49,7 +59,9 @@ async function loadTransactions() {
 function renderTransactions() {
     const tbody = document.getElementById('transactions-tbody');
     const query = document.getElementById('search-input').value.toLowerCase();
-    const statusFilter = document.getElementById('status-filter').value;
+    
+    const activeTab = document.querySelector('#status-tabs .tab-item.active');
+    const statusFilter = activeTab ? activeTab.getAttribute('data-status') : '';
 
     const filtered = allTransactions.filter(p => {
         const matchStatus = statusFilter ? p.status === statusFilter : true;
@@ -88,17 +100,19 @@ function renderTransactions() {
         if (method === 'bank_transfer') icon = 'ph-bank';
 
         const emailOrName = p.receipt_email || p.shipping?.name || 'Guest / Unknown';
+        const customerName = p.forum_name || emailOrName;
+        const avatarHtml = p.avatar_url ? `<img src="${p.avatar_url}" class="avatar-img">` : App.getAvatarPlaceholder(customerName);
 
         // Render Row
         html += `
             <tr style="cursor: pointer;" onclick="openDetailsModal('${p.id}')">
                 <td>
                     <div style="display: flex; align-items: center; gap: 12px;">
-                        <div class="avatar avatar-sm" style="background: var(--bg-surface-hover); color: var(--text-main); border: 1px solid var(--border-color);">
-                            <i class="ph ${icon}"></i>
+                        <div class="avatar avatar-sm">
+                            ${avatarHtml}
                         </div>
                         <div style="display: flex; flex-direction: column;">
-                            <span style="font-weight: 500;">${emailOrName}</span>
+                            <span style="font-weight: 500;">${customerName}</span>
                             <span class="text-muted" style="font-size: 0.75rem;">${App.capitalize(method)} • <code class="inline-code" style="background:transparent;border:none;padding:0;">${p.id.slice(0, 8)}...</code></span>
                         </div>
                     </div>
@@ -218,7 +232,8 @@ async function processRefund() {
 function exportCSV() {
     // Only export currently filtered items
     const query = document.getElementById('search-input').value.toLowerCase();
-    const statusFilter = document.getElementById('status-filter').value;
+    const activeTab = document.querySelector('#status-tabs .tab-item.active');
+    const statusFilter = activeTab ? activeTab.getAttribute('data-status') : '';
     const filtered = allTransactions.filter(p => {
         const matchStatus = statusFilter ? p.status === statusFilter : true;
         let metaStr = '';
