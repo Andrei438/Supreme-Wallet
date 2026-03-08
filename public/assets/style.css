@@ -451,6 +451,15 @@ h6 {
     position: relative;
     overflow: hidden;
     transition: transform var(--transition), box-shadow var(--transition);
+    text-decoration: none; /* For <a> wrapping */
+}
+
+.metric-card.clickable {
+    cursor: pointer;
+}
+
+.metric-card.clickable:active {
+    transform: translateY(0) scale(0.98);
 }
 
 .metric-card:hover {

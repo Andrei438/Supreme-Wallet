@@ -96,41 +96,41 @@ async function loadDashboardData() {
 
         // Financial Overview Cards
         metricsContainer.innerHTML = `
-            <div class="metric-card">
+            <a href="transactions.html" class="metric-card clickable">
                 <div class="metric-header">
                     <div class="metric-title">Total Revenue</div>
                     <div class="metric-icon primary"><i class="ph ph-currency-dollar"></i></div>
                 </div>
                 <div class="metric-value" id="count-rev">$0.00</div>
                 <div class="metric-trend trend-up"><i class="ph ph-trend-up"></i> ${revGrowth} vs last month</div>
-            </div>
+            </a>
 
-            <div class="metric-card">
+            <a href="refunds.html" class="metric-card clickable">
                 <div class="metric-header">
                     <div class="metric-title">Refunds & Fails</div>
                     <div class="metric-icon danger"><i class="ph ph-arrow-u-down-left"></i></div>
                 </div>
                 <div class="metric-value" id="count-fails">0</div>
                 <div class="metric-trend trend-down"><i class="ph ph-trend-down"></i> Needs attention</div>
-            </div>
+            </a>
 
-            <div class="metric-card">
+            <a href="balance.html" class="metric-card clickable">
                 <div class="metric-header">
                     <div class="metric-title">Available Balance</div>
                     <div class="metric-icon success"><i class="ph ph-bank"></i></div>
                 </div>
                 <div class="metric-value" id="count-avail">$0.00</div>
                 <div class="metric-trend trend-up"><i class="ph ph-trend-up"></i> ${balGrowth} ready to payout</div>
-            </div>
+            </a>
 
-            <div class="metric-card">
+            <a href="balance.html" class="metric-card clickable">
                 <div class="metric-header">
                     <div class="metric-title">Pending Balance</div>
                     <div class="metric-icon warning"><i class="ph ph-clock"></i></div>
                 </div>
                 <div class="metric-value" id="count-pend">$0.00</div>
                 <div class="metric-trend trend-neutral"><i class="ph ph-hourglass"></i> Held by Stripe</div>
-            </div>
+            </a>
         `;
 
         // Animate numbers

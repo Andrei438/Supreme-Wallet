@@ -27,7 +27,7 @@ async function getUsernameByEmail(email) {
         if (cached) return cached;
 
         // 2. Fetch from XenForo API
-        const url = new URL(`${config.xenforoApiUrl}/api/users/find-name`);
+        const url = new URL(`${config.xenforoApiUrl}/api/users/find`);
         url.searchParams.append('email', email);
 
         const response = await fetch(url.toString(), {
@@ -35,7 +35,10 @@ async function getUsernameByEmail(email) {
             signal: AbortSignal.timeout(5000)
         });
 
-        if (!response.ok) throw new Error(`API returned ${response.status}`);
+        if (!response.ok) {
+            const errBody = await response.text();
+            throw new Error(`API returned ${response.status}: ${errBody}`);
+        }
         
         const data = await response.json();
         const username = data?.user?.username || null;
