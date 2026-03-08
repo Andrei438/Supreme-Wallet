@@ -228,12 +228,18 @@ const App = {
 
     apiGet: async (url) => {
         const fullUrl = url.startsWith('/api/') ? `${BASE}${url}` : url;
-        const res = await fetch(fullUrl);
-        if (!res.ok) {
-            const err = await res.json();
-            throw new Error(err.error || 'Network request failed');
+        try {
+            const res = await fetch(fullUrl);
+            if (!res.ok) {
+                const err = await res.json();
+                console.error(`[API Error] GET ${url} failed:`, err);
+                throw new Error(err.error || 'Network request failed');
+            }
+            return await res.json();
+        } catch (e) {
+            console.error(`[API Network Error] GET ${url} failed:`, e);
+            throw e;
         }
-        return await res.json();
     },
 
     apiPost: async (url, data) => {
