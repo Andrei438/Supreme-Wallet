@@ -44,7 +44,9 @@ const App = {
                 App.state.user = data.user;
                 // Render user details in sidebar/topbar if present
                 const userNameEl = document.getElementById('user-name-display');
-                if (userNameEl) userNameEl.textContent = data.user;
+                if (userNameEl) {
+                    userNameEl.textContent = data.user || 'Admin';
+                }
             } else {
                 window.location.href = `${BASE}/login.html`;
             }

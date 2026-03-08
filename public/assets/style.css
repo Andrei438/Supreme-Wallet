@@ -60,7 +60,7 @@
 
 body {
     background: linear-gradient(135deg, #000000 0%, var(--bg-secondary) 50%, var(--bg-tertiary) 100%);
-    color: var(--text-primary);
+    color: var(--text-main);
     font-family: 'Poppins', sans-serif;
     line-height: 1.6;
     min-height: 100vh;
@@ -137,7 +137,7 @@ h6 {
 }
 
 .sidebar-header {
-    height: 70px;
+    height: 100px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -147,16 +147,16 @@ h6 {
 }
 
 .sidebar-logo-img {
-    height: 32px;
+    height: 48px;
     width: auto;
-    max-width: 100%;
+    max-width: 90%;
     object-fit: contain;
-    filter: drop-shadow(0 0 10px rgba(239, 68, 68, 0.2));
+    filter: drop-shadow(0 0 15px rgba(239, 68, 68, 0.3));
     transition: var(--transition);
 }
 
 .sidebar.collapsed .sidebar-logo-img {
-    height: 24px;
+    height: 32px;
 }
 
 .supreme-box {
@@ -1276,11 +1276,10 @@ code.inline-code {
 }
 
 .login-icon {
-    width: 120px;
+    width: 240px;
     height: auto;
-    max-width: 200px;
     margin-bottom: 24px;
-    filter: drop-shadow(0 0 15px rgba(239, 68, 68, 0.3));
+    filter: drop-shadow(0 0 20px rgba(239, 68, 68, 0.4));
     transition: all 0.3s ease;
 }
 
