@@ -88,12 +88,10 @@ app.get(dashboardPages, auth.isAuthenticated, (req, res, next) => {
     next();
 });
 
-// Root redirect to base path (only if BASE is defined)
-if (BASE && BASE !== '/') {
-    app.get('/', (req, res) => {
-        res.redirect(BASE);
-    });
-}
+// Root redirect to base path
+app.get('/', (req, res) => {
+    res.redirect(BASE || '/wallet');
+});
 
 // /wallet redirect to login or dashboard
 app.get([`${BASE}`, `${BASE}/`], (req, res) => {

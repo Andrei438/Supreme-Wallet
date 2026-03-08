@@ -13,6 +13,6 @@ module.exports = {
   totpSecret: process.env.TOTP_SECRET || '',
   // This key is used for disk encryption of ledger/webhooks. Keep it extremely safe!
   encryptionKey: process.env.ENCRYPTION_KEY || 'a-very-secure-default-encryption-key-change-me',
-  // Base URL path for the app. Set to '/wallet' to host at example.com/wallet
-  basePath: process.env.BASE_PATH || ''
+  // Base URL path for the app. Defaults to /wallet
+  basePath: process.env.BASE_PATH || '/wallet'
 };
