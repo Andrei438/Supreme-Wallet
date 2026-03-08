@@ -4,9 +4,9 @@
 
 :root {
     /* Base Colors */
-    --primary: #6366f1;
-    --primary-hover: #4f46e5;
-    --primary-light: rgba(99, 102, 241, 0.1);
+    --primary: #ff0000; /* Supreme Red */
+    --primary-light: rgba(255, 0, 0, 0.1);
+    --primary-dark: #cc0000;
 
     /* Light Theme UI Colors */
     --bg-main: #f8fafc;
@@ -153,18 +153,33 @@ h6 {
 }
 
 .sidebar-header {
-    height: 70px;
+    height: 90px;
     padding: 0 24px;
-    font-size: 1.5rem;
-    font-weight: 700;
-    font-family: 'Outfit', sans-serif;
-    color: var(--primary);
     display: flex;
     align-items: center;
-    gap: 12px;
+    justify-content: flex-start;
     border-bottom: 1px solid var(--border-color);
-    letter-spacing: -0.01em;
-    white-space: nowrap;
+}
+
+.supreme-box {
+    background: #ff0000;
+    color: #ffffff;
+    padding: 6px 14px;
+    font-family: 'Outfit', sans-serif; /* Best available on system */
+    font-weight: 900;
+    font-size: 1.6rem;
+    font-style: italic;
+    letter-spacing: -0.06em;
+    text-transform: lowercase;
+    display: inline-block;
+    line-height: 1;
+}
+
+.sidebar.collapsed .supreme-box {
+    font-size: 1.2rem;
+    padding: 6px 8px;
+    width: 32px;
+    text-align: center;
 }
 
 .sidebar-header i {
@@ -1264,15 +1279,14 @@ code.inline-code {
 }
 
 .auth-title {
-    font-family: 'Outfit', sans-serif;
-    font-size: 2.25rem;
-    font-weight: 700;
-    margin-bottom: 8px;
-    background: linear-gradient(135deg, #fff 0%, #8892b0 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    letter-spacing: -0.02em;
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: center;
+}
+
+.auth-title .supreme-box {
+    font-size: 2.5rem;
+    padding: 10px 24px;
 }
 
 .auth-subtitle {
@@ -1384,7 +1398,7 @@ code.inline-code {
 .orb-1 {
     width: 600px;
     height: 600px;
-    background: radial-gradient(circle, rgba(0, 136, 204, 0.3) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(255, 0, 0, 0.2) 0%, transparent 70%);
     top: -200px;
     right: -100px;
     animation: float 20s infinite alternate;
@@ -1393,7 +1407,7 @@ code.inline-code {
 .orb-2 {
     width: 400px;
     height: 400px;
-    background: radial-gradient(circle, rgba(0, 85, 255, 0.2) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(255, 0, 0, 0.1) 0%, transparent 70%);
     bottom: -100px;
     left: -100px;
     animation: float 15s infinite alternate-reverse;
