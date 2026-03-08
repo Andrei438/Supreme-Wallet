@@ -30,7 +30,7 @@ services:
       retries: 3
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.supreme-wallet.rule=Host(`wallet.supreme-cheats.xyz`)"
+      - "traefik.http.routers.supreme-wallet.rule=Host(`admin.supreme-cheats.xyz`) && PathPrefix(`/wallet`)"
       - "traefik.http.routers.supreme-wallet.entrypoints=websecure"
       - "traefik.http.routers.supreme-wallet.tls.certresolver=letsencrypt"
       - "traefik.http.services.supreme-wallet.loadbalancer.server.port=3000"
