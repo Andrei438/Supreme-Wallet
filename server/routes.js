@@ -35,13 +35,16 @@ router.get('/payments', async (req, res) => {
         const payments = await stripeService.getPayments(limit);
         
         // Batch enrichment to prevent overwhelming the network/API
-        const CHUNK_SIZE = 10;
+        // Batch enrichment with concurrency control and tight timeouts
+        const CHUNK_SIZE = 5; // Smaller chunks for better responsiveness
         for (let i = 0; i < payments.data.length; i += CHUNK_SIZE) {
             const chunk = payments.data.slice(i, i + CHUNK_SIZE);
             await Promise.all(chunk.map(async (p) => {
                 try {
+                    // Start with metadata
                     p.forum_name = p.metadata?.username || p.metadata?.forum_name || null;
                     const xfId = p.metadata?.user_id || p.metadata?.forum_id || p.metadata?.xf_user_id;
+
                     if (xfId) {
                         const xfUser = await xenforoService.getUserInfoById(xfId);
                         if (xfUser) {
@@ -49,6 +52,8 @@ router.get('/payments', async (req, res) => {
                             p.avatar_url = xfUser.avatar_url;
                         }
                     }
+
+                    // Only fallback to email if we have one and no avatar yet
                     if (!p.avatar_url) {
                         const email = p.receipt_email || p.billing_details?.email;
                         if (email) {
@@ -60,9 +65,12 @@ router.get('/payments', async (req, res) => {
                         }
                     }
                 } catch (err) {
-                    console.error(`[Routes] Enrichment failed for ${p.id}:`, err.message);
+                    console.error(`[Routes] Enrichment skipped for ${p.id}:`, err.message);
                 }
             }));
+            
+            // Safety break: if processing takes too long overall, we should stop enriching and return
+            // But for now, CHUNK_SIZE=5 is a good middle ground.
         }
 
         res.json({ data: payments.data });
@@ -91,31 +99,36 @@ router.get('/customers', async (req, res) => {
         const limit = parseInt(req.query.limit) || 100;
         const customers = await stripeService.getCustomers(limit);
         
-        // Enrich with Names and Avatars in parallel
-        await Promise.all(customers.data.map(async (c) => {
-            try {
-                c.forum_name = c.metadata?.username || c.metadata?.forum_name || null;
-                
-                const xfId = c.metadata?.user_id || c.metadata?.forum_id || c.metadata?.xf_user_id;
-                if (xfId) {
-                    const xfUser = await xenforoService.getUserInfoById(xfId);
-                    if (xfUser) {
-                        if (!c.forum_name) c.forum_name = xfUser.username;
-                        c.avatar_url = xfUser.avatar_url;
+        // Batch enrichment with concurrency control
+        const CHUNK_SIZE = 5;
+        for (let i = 0; i < customers.data.length; i += CHUNK_SIZE) {
+            const chunk = customers.data.slice(i, i + CHUNK_SIZE);
+            await Promise.all(chunk.map(async (c) => {
+                try {
+                    c.forum_name = c.metadata?.username || c.metadata?.forum_name || null;
+                    const xfId = c.metadata?.user_id || c.metadata?.forum_id || c.metadata?.xf_user_id;
+                    if (xfId) {
+                        const xfUser = await xenforoService.getUserInfoById(xfId);
+                        if (xfUser) {
+                            if (!c.forum_name) c.forum_name = xfUser.username;
+                            c.avatar_url = xfUser.avatar_url;
+                        }
                     }
-                }
-
-                if (!c.avatar_url && c.email) {
-                    const xfUser = await xenforoService.getUserInfoByEmail(c.email);
-                    if (xfUser) {
-                        if (!c.forum_name) c.forum_name = xfUser.username;
-                        c.avatar_url = xfUser.avatar_url;
+                    if (!c.avatar_url) {
+                        const email = c.email;
+                        if (email) {
+                            const xfUser = await xenforoService.getUserInfoByEmail(email);
+                            if (xfUser) {
+                                if (!c.forum_name) c.forum_name = xfUser.username;
+                                c.avatar_url = xfUser.avatar_url;
+                            }
+                        }
                     }
+                } catch (err) {
+                    console.error(`[Routes] Customer Enrichment skipped for ${c.id}:`, err.message);
                 }
-            } catch (err) {
-                console.error(`[Routes] Failed to enrich customer ${c.id}:`, err.message);
-            }
-        }));
+            }));
+        }
 
         res.json({ data: customers.data });
     } catch (error) { res.status(500).json({ error: error.message }); }
