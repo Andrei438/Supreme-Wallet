@@ -39,13 +39,25 @@ router.get('/payments', async (req, res) => {
             // Prioritize metadata
             p.forum_name = p.metadata?.username || p.metadata?.forum_name || null;
             
-            // Fallback to XenForo if needed or to get avatar
-            const email = p.receipt_email || p.billing_details?.email;
-            if (email) {
-                const xfUser = await xenforoService.getUserInfoByEmail(email);
+            // Use ID if available in metadata (most reliable)
+            const xfId = p.metadata?.user_id || p.metadata?.forum_id || p.metadata?.xf_user_id;
+            if (xfId) {
+                const xfUser = await xenforoService.getUserInfoById(xfId);
                 if (xfUser) {
                     if (!p.forum_name) p.forum_name = xfUser.username;
                     p.avatar_url = xfUser.avatar_url;
+                }
+            }
+
+            // Fallback to Email if ID lookup yielded nothing
+            if (!p.avatar_url) {
+                const email = p.receipt_email || p.billing_details?.email;
+                if (email) {
+                    const xfUser = await xenforoService.getUserInfoByEmail(email);
+                    if (xfUser) {
+                        if (!p.forum_name) p.forum_name = xfUser.username;
+                        p.avatar_url = xfUser.avatar_url;
+                    }
                 }
             }
         }
@@ -80,7 +92,16 @@ router.get('/customers', async (req, res) => {
         for (let c of customers.data) {
             c.forum_name = c.metadata?.username || c.metadata?.forum_name || null;
             
-            if (c.email) {
+            const xfId = c.metadata?.user_id || c.metadata?.forum_id || c.metadata?.xf_user_id;
+            if (xfId) {
+                const xfUser = await xenforoService.getUserInfoById(xfId);
+                if (xfUser) {
+                    if (!c.forum_name) c.forum_name = xfUser.username;
+                    c.avatar_url = xfUser.avatar_url;
+                }
+            }
+
+            if (!c.avatar_url && c.email) {
                 const xfUser = await xenforoService.getUserInfoByEmail(c.email);
                 if (xfUser) {
                     if (!c.forum_name) c.forum_name = xfUser.username;
@@ -98,7 +119,16 @@ router.get('/customer/:id', async (req, res) => {
         const customer = await stripeService.getCustomer(req.params.id);
         customer.forum_name = customer.metadata?.username || customer.metadata?.forum_name || null;
         
-        if (customer.email) {
+        const xfId = customer.metadata?.user_id || customer.metadata?.forum_id || customer.metadata?.xf_user_id;
+        if (xfId) {
+            const xfUser = await xenforoService.getUserInfoById(xfId);
+            if (xfUser) {
+                if (!customer.forum_name) customer.forum_name = xfUser.username;
+                customer.avatar_url = xfUser.avatar_url;
+            }
+        }
+
+        if (!customer.avatar_url && customer.email) {
             const xfUser = await xenforoService.getUserInfoByEmail(customer.email);
             if (xfUser) {
                 if (!customer.forum_name) customer.forum_name = xfUser.username;

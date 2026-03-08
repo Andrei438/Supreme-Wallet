@@ -36,6 +36,11 @@ async function getUserInfoByEmail(email) {
             signal: AbortSignal.timeout(5000)
         });
 
+        if (response.status === 403) {
+            console.warn(`[XenForo Service] Permission denied (403) for email lookup: ${email}. Falling back to metadata/placeholders.`);
+            return null;
+        }
+
         if (!response.ok) {
             const errBody = await response.text();
             
@@ -56,12 +61,50 @@ async function getUserInfoByEmail(email) {
         }
         
         const data = await response.json();
-        // /api/users/ returns a list of results { users: [...], pagination: ... }
         const user = data?.users?.[0] || data?.user;
         
         return handleUserResponse(user, cacheKey, redis);
     } catch (error) {
         console.error(`[XenForo Service] Lookup failed for ${email}:`, error.message);
+        return null;
+    }
+}
+
+/**
+ * Fetches user info by numeric ID. More reliable as it avoids email search permissions.
+ */
+async function getUserInfoById(userId) {
+    if (!userId || !config.xenforoApiUrl || !config.xenforoApiKey) return null;
+
+    const cacheKey = `xf_user_id_v1:${userId}`;
+    const redis = await getRedis();
+
+    try {
+        const cached = await redis.get(cacheKey);
+        if (cached) return JSON.parse(cached);
+
+        const response = await fetch(`${config.xenforoApiUrl}/api/users/${userId}/`, {
+            headers: { 'XF-Api-Key': config.xenforoApiKey },
+            signal: AbortSignal.timeout(5000)
+        });
+
+        if (response.status === 403) {
+            console.warn(`[XenForo Service] Permission denied (403) for ID lookup: ${userId}.`);
+            // Construct a public avatar URL as fallback since we know the ID
+            const forumBase = config.xenforoApiUrl.replace(/\/index\.php$/, '').replace(/\/$/, '');
+            return {
+                user_id: userId,
+                avatar_url: `${forumBase}/api/users/${userId}/avatar` // XF2 provides a public avatar redirect
+            };
+        }
+
+        if (!response.ok) return null;
+        
+        const data = await response.json();
+        const user = data?.user;
+        return handleUserResponse(user, cacheKey, redis);
+    } catch (error) {
+        console.error(`[XenForo Service] ID Lookup failed for ${userId}:`, error.message);
         return null;
     }
 }
@@ -86,5 +129,6 @@ async function handleUserResponse(user, cacheKey, redis) {
 }
 
 module.exports = {
-    getUserInfoByEmail
+    getUserInfoByEmail,
+    getUserInfoById
 };
