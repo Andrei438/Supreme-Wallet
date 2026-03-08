@@ -33,18 +33,29 @@ webhookHandler.setupWebhook(app, express);
 // Parse JSON payload
 app.use(express.json());
 
+// Redis Session Store Setup
+const { createClient } = require('redis');
+const RedisStore = require('connect-redis').default;
+
+const redisClient = createClient({ url: config.redisUrl });
+redisClient.connect().catch(err => console.error('[Redis] Connection Error:', err));
+
+const redisStore = new RedisStore({
+    client: redisClient,
+    prefix: "wallet_sess:"
+});
+
 // Session Management
 app.use(session({
+    store: redisStore,
     secret: config.sessionSecret,
     resave: false,
     saveUninitialized: false,
     cookie: {
-        // Only require secure cookies if in production AND not on localhost
-        // If testing production mode locally on HTTP, secure must be false
         secure: config.nodeEnv === 'production' && process.env.ALLOW_HTTP_SESSION !== 'true',
         httpOnly: true,
         sameSite: 'lax',
-        maxAge: 1000 * 60 * 60 * 24 // 1 day
+        maxAge: 1000 * 60 * 60 * 24 * 30 // 30 days
     }
 }));
 

@@ -11,6 +11,7 @@ module.exports = {
   defaultCurrency: process.env.DEFAULT_CURRENCY || 'usd',
   nodeEnv: process.env.NODE_ENV || 'development',
   totpSecret: process.env.TOTP_SECRET || '',
+  redisUrl: process.env.REDIS_URL || 'redis://localhost:6379',
   // This key is used for disk encryption of ledger/webhooks. Keep it extremely safe!
   encryptionKey: process.env.ENCRYPTION_KEY || 'a-very-secure-default-encryption-key-change-me',
   // Base URL path for the app. Defaults to /wallet
