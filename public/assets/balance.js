@@ -27,6 +27,9 @@ async function loadData() {
         document.getElementById('balance-available').textContent = App.formatCurrency(avail.amount, avail.currency);
         document.getElementById('balance-pending').textContent = App.formatCurrency(pend.amount, pend.currency);
 
+        const nextP = allPayouts.find(p => p.status === 'pending' || p.status === 'in_transit');
+        document.getElementById('next-payout-date').textContent = nextP ? App.formatDate(nextP.arrival_date) : 'No pending';
+
         renderRows();
     } catch (e) {
         App.showToast('Failed to load balance', 'error');
@@ -52,7 +55,16 @@ function renderRows() {
         if (p.status === 'pending') statusClass = 'badge-warning';
         if (p.status === 'failed' || p.status === 'canceled') statusClass = 'badge-danger';
 
-        const bankA = p.destination || 'Bank Account';
+        let destTitle = 'Bank Account';
+        let destSub = p.id;
+
+        if (p.destination) {
+            if (p.destination.object === 'bank_account') {
+                destTitle = `${p.destination.bank_name} •••• ${p.destination.last4}`;
+            } else if (p.destination.object === 'card') {
+                destTitle = `${p.destination.brand} •••• ${p.destination.last4}`;
+            }
+        }
 
         html += `
             <tr>
@@ -62,7 +74,7 @@ function renderRows() {
                             <i class="ph ph-bank"></i>
                         </div>
                         <div style="display: flex; flex-direction: column;">
-                            <span style="font-weight: 500;">${bankA}</span>
+                            <span style="font-weight: 500;">${destTitle}</span>
                             <span class="text-muted" style="font-size: 0.75rem;"><code class="inline-code" style="background:transparent;border:none;padding:0;">${p.id}</code></span>
                         </div>
                     </div>

@@ -52,7 +52,7 @@ async function getInvoices(limit = 50) {
 
 async function getPayouts(limit = 50) {
     const s = ensureStripe();
-    return await s.payouts.list({ limit });
+    return await s.payouts.list({ limit, expand: ['data.destination'] });
 }
 
 async function getRefunds(limit = 50) {

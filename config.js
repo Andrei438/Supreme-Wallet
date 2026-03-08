@@ -15,5 +15,7 @@ module.exports = {
   // This key is used for disk encryption of ledger/webhooks. Keep it extremely safe!
   encryptionKey: process.env.ENCRYPTION_KEY || 'a-very-secure-default-encryption-key-change-me',
   // Base URL path for the app. Defaults to /wallet
-  basePath: process.env.BASE_PATH || '/wallet'
+  basePath: process.env.BASE_PATH || '/wallet',
+  xenforoApiUrl: process.env.XENFORO_API_URL || '',
+  xenforoApiKey: process.env.XENFORO_API_KEY || ''
 };

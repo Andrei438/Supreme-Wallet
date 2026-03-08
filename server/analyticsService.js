@@ -51,8 +51,7 @@ async function getDashboardMetrics() {
                 totalRevenue,
                 totalRefunds,
                 successfulPayments,
-                failedPayments,
-                activeSubscriptions: activeSubCount
+                failedPayments
                 // totalCustomers: customers.data.length - this is paginated so it only shows up to limit
             },
             charts: {

@@ -107,15 +107,6 @@ async function loadDashboardData() {
 
             <div class="metric-card">
                 <div class="metric-header">
-                    <div class="metric-title">Net Profit</div>
-                    <div class="metric-icon success"><i class="ph ph-chart-line-up"></i></div>
-                </div>
-                <div class="metric-value" id="count-profit">$0.00</div>
-                <div class="metric-trend trend-neutral"><i class="ph ph-minus"></i> Stated via Ledger</div>
-            </div>
-
-            <div class="metric-card">
-                <div class="metric-header">
                     <div class="metric-title">Refunds & Fails</div>
                     <div class="metric-icon danger"><i class="ph ph-arrow-u-down-left"></i></div>
                 </div>
@@ -140,24 +131,13 @@ async function loadDashboardData() {
                 <div class="metric-value" id="count-pend">$0.00</div>
                 <div class="metric-trend trend-neutral"><i class="ph ph-hourglass"></i> Held by Stripe</div>
             </div>
-
-            <div class="metric-card">
-                <div class="metric-header">
-                    <div class="metric-title">Active Subs</div>
-                    <div class="metric-icon primary"><i class="ph ph-repeat"></i></div>
-                </div>
-                <div class="metric-value" id="count-subs">0</div>
-                <div class="metric-trend trend-up"><i class="ph ph-trend-up"></i> +2 new this week</div>
-            </div>
         `;
 
         // Animate numbers
         animateValue(document.getElementById('count-rev'), 0, totalRev, 1000, (v) => App.formatCurrency(v, currency));
-        animateValue(document.getElementById('count-profit'), 0, localLedgerRes.netProfit, 1000, (v) => App.formatCurrency(v, currency));
         animateValue(document.getElementById('count-fails'), 0, data.metrics.failedPayments, 1000, (v) => v);
         animateValue(document.getElementById('count-avail'), 0, availBal, 1000, (v) => App.formatCurrency(v, currency));
         animateValue(document.getElementById('count-pend'), 0, pendingBal, 1000, (v) => App.formatCurrency(v, currency));
-        animateValue(document.getElementById('count-subs'), 0, data.metrics.activeSubscriptions, 1000, (v) => v);
 
         // Render Charts
         rawPayments = (await App.apiGet('/api/payments?limit=100')).data;
@@ -201,7 +181,7 @@ async function loadRecentActivity() {
                                     <i class="ph ${icon}"></i>
                                 </div>
                                 <div style="display: flex; flex-direction: column;">
-                                    <span style="font-weight: 500; font-size: 0.9rem;">${p.receipt_email || p.id}</span>
+                                    <span style="font-weight: 500; font-size: 0.9rem;">${p.forum_name || p.receipt_email || p.id}</span>
                                     <span class="text-muted" style="font-size: 0.75rem;">via ${App.capitalize(method)}</span>
                                 </div>
                             </div>

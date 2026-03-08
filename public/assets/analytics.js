@@ -116,7 +116,6 @@ function renderAllAnalytics() {
     renderRevenueTrend();
     renderRefundTrend();
     renderSuccessRate();
-    renderSubGrowth();
     renderPayouts();
     renderTopCustomers();
 }
@@ -188,13 +187,6 @@ function renderRefundTrend() {
     createLineChart('chart-refunds', 'refunds', 'Refunded Amount', '#ef4444', group, true);
 }
 
-function renderSubGrowth() {
-    // Treat creation date of sub as +1
-    const group = groupDataByDate(rawData.subs, 'created', 'count');
-
-    // Convert to cumulative if we wanted to true growth, but let's just show new subs per day for simplicity
-    createLineChart('chart-subs', 'subs', 'New Subscriptions', '#10b981', group, false);
-}
 
 function renderPayouts() {
     // Show total payouts sent

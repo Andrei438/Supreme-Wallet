@@ -5,6 +5,7 @@ const stripeService = require('./stripeService');
 const analyticsService = require('./analyticsService');
 const ledgerService = require('./ledgerService');
 const storage = require('./storage');
+const xenforoService = require('./xenforoService');
 
 const router = express.Router();
 
@@ -32,6 +33,14 @@ router.get('/payments', async (req, res) => {
     try {
         const limit = parseInt(req.query.limit) || 100;
         const payments = await stripeService.getPayments(limit);
+        
+        // Enrich with XenForo names
+        for (let p of payments.data) {
+            if (p.receipt_email) {
+                p.forum_name = await xenforoService.getUsernameByEmail(p.receipt_email);
+            }
+        }
+
         res.json({ data: payments.data });
     } catch (error) { res.status(500).json({ error: error.message }); }
 });
@@ -57,6 +66,14 @@ router.get('/customers', async (req, res) => {
     try {
         const limit = parseInt(req.query.limit) || 100;
         const customers = await stripeService.getCustomers(limit);
+        
+        // Enrich with XenForo names
+        for (let c of customers.data) {
+            if (c.email) {
+                c.forum_name = await xenforoService.getUsernameByEmail(c.email);
+            }
+        }
+
         res.json({ data: customers.data });
     } catch (error) { res.status(500).json({ error: error.message }); }
 });
@@ -64,6 +81,9 @@ router.get('/customers', async (req, res) => {
 router.get('/customer/:id', async (req, res) => {
     try {
         const customer = await stripeService.getCustomer(req.params.id);
+        if (customer.email) {
+            customer.forum_name = await xenforoService.getUsernameByEmail(customer.email);
+        }
         res.json(customer);
     } catch (error) { res.status(500).json({ error: error.message }); }
 });

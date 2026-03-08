@@ -49,8 +49,8 @@ function renderCustomers() {
     const query = document.getElementById('search-input').value.toLowerCase();
 
     const filtered = allCustomers.filter(c => {
-        const matchName = c.name && c.name.toLowerCase().includes(query);
-        const matchEmail = c.email && c.email.toLowerCase().includes(query);
+        const matchName = (c.forum_name || c.name || '').toLowerCase().includes(query);
+        const matchEmail = (c.email || '').toLowerCase().includes(query);
         const matchId = c.id.toLowerCase().includes(query);
         return matchName || matchEmail || matchId;
     });
@@ -63,7 +63,7 @@ function renderCustomers() {
     let html = '';
     filtered.forEach(c => {
         const spendInfo = calculateSpend(c.id);
-        const name = c.name || 'Unnamed Customer';
+        const name = c.forum_name || c.name || 'Unnamed Customer';
         const email = c.email || 'No email provided';
         const initial = name.charAt(0).toUpperCase();
 
@@ -96,7 +96,7 @@ function openCustomerModal(id) {
     if (!c) return;
 
     const spendInfo = calculateSpend(c.id);
-    const name = c.name || 'Unnamed Customer';
+    const name = c.forum_name || c.name || 'Unnamed Customer';
 
     document.getElementById('modal-avatar').textContent = name.charAt(0).toUpperCase();
     document.getElementById('modal-name').textContent = name;
