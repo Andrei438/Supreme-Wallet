@@ -1,0 +1,12 @@
+# Dependencies
+node_modules/
+
+# Docker / Dokploy
+.env
+data/
+
+# Debug
+npm-debug.log*
+
+# OS
+.DS_Store

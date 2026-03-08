@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Supreme Wallet</title>
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link rel="stylesheet" href="assets/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="auth-wrapper">
+        <div class="auth-card">
+            <h1 class="auth-title">Supreme Wallet</h1>
+            <p class="auth-subtitle">Secure access to your financial dashboard</p>
+
+            <form id="login-form">
+                <div class="form-group">
+                    <label class="form-label" for="code">Authenticator Code</label>
+                    <input type="text" id="code" class="form-control" placeholder="123456" pattern="\d*" maxlength="6"
+                        autocomplete="one-time-code" required autofocus
+                        style="text-align: center; font-size: 1.5rem; letter-spacing: 0.5rem; font-weight: 600;">
+                </div>
+
+                <div id="login-error" class="text-danger"
+                    style="display: none; font-size: 0.875rem; margin-bottom: 16px; text-align: center;"></div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">
+                    <i class="ph ph-sign-in"></i> Sign In
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- The common app.js could be included, but we'll include a standalone script for simplicity 
+         Wait, we made auth.js handle this, and app.js handles global theme if we want. -->
+    <script src="assets/auth.js"></script>
+</body>
+
+</html>

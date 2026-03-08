@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transactions | Supreme Wallet</title>
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link rel="stylesheet" href="assets/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <i class="ph-fill ph-wallet"></i>
+                <span>Supreme Wallet</span>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="index.html" class="nav-item" data-tooltip="Overview"><i class="ph ph-squares-four"></i>
+                    <span>Overview</span></a>
+                <a href="transactions.html" class="nav-item active" data-tooltip="Transactions"><i
+                        class="ph ph-arrows-left-right"></i> <span>Transactions</span></a>
+                <a href="customers.html" class="nav-item" data-tooltip="Customers"><i class="ph ph-users"></i>
+                    <span>Customers</span></a>
+                <a href="subscriptions.html" class="nav-item" data-tooltip="Subscriptions"><i class="ph ph-repeat"></i>
+                    <span>Subscriptions</span></a>
+                <a href="invoices.html" class="nav-item" data-tooltip="Invoices"><i class="ph ph-receipt"></i>
+                    <span>Invoices</span></a>
+                <a href="balance.html" class="nav-item" data-tooltip="Balance & Payouts"><i class="ph ph-scales"></i>
+                    <span>Balance & Payouts</span></a>
+                <a href="refunds.html" class="nav-item" data-tooltip="Refunds"><i class="ph ph-arrow-u-down-left"></i>
+                    <span>Refunds</span></a>
+                <a href="disputes.html" class="nav-item" data-tooltip="Disputes"><i class="ph ph-warning-octagon"></i>
+                    <span>Disputes</span></a>
+                <a href="events.html" class="nav-item" data-tooltip="Stripe Events"><i class="ph ph-bell-ringing"></i>
+                    <span>Stripe Events</span></a>
+                <a href="analytics.html" class="nav-item" data-tooltip="Analytics"><i class="ph ph-chart-line-up"></i>
+                    <span>Analytics</span></a>
+                <a href="ledger.html" class="nav-item" data-tooltip="Mini Ledger"><i class="ph ph-book-open"></i>
+                    <span>Mini Ledger</span></a>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="settings.html" class="nav-item" data-tooltip="Settings"><i class="ph ph-gear"></i>
+                    <span>Settings</span></a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-wrapper">
+            <!-- Topbar -->
+            <header class="topbar">
+                <div class="topbar-left">
+                    <button id="sidebar-toggle" class="btn-icon" style="display: none;"><i
+                            class="ph ph-list"></i></button>
+                    <!-- Show desktop collapse button via CSS media query, hidden on mobile -->
+                    <button id="mobile-menu-btn" class="btn-icon" style="display: none;"><i
+                            class="ph ph-list"></i></button>
+                    <button id="desktop-sidebar-btn" class="btn-icon" onclick="App.toggleSidebar()"><i
+                            class="ph ph-list"></i></button>
+
+                    <div class="global-search">
+                        <i class="ph ph-magnifying-glass text-muted"></i>
+                        <input type="text" placeholder="Search transactions, customers...">
+                    </div>
+                </div>
+                <div class="topbar-right">
+                    <span class="badge badge-warning" id="stripe-mode-badge"
+                        style="font-size: 0.7rem; padding: 2px 8px;">Test Mode</span>
+                    <button class="btn-icon" title="Notifications"><i class="ph ph-bell"></i></button>
+                    <button id="theme-toggle" class="btn-icon" title="Toggle Theme"><i class="ph ph-moon"></i></button>
+                    <div style="height: 32px; width: 1px; background: var(--border-color); margin: 0 8px;"></div>
+                    <div style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
+                        <div class="avatar avatar-sm">A</div>
+                        <div style="display: flex; flex-direction: column;">
+                            <span id="user-name-display" style="font-size: 0.85rem; font-weight: 600;">Admin</span>
+                            <span class="text-muted" style="font-size: 0.75rem;">Owner</span>
+                        </div>
+                        <i class="ph ph-caret-down text-muted" style="margin-left: 8px;"></i>
+                    </div>
+                    <button id="logout-btn" class="btn-icon text-muted" title="Logout" style="margin-left: 10px;"><i
+                            class="ph ph-sign-out"></i></button>
+                </div>
+            </header>
+
+            <div class="content">
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title">Transactions</h1>
+                        <p class="page-subtitle">View and manage all payment intents.</p>
+                    </div>
+                    <div class="flex-center gap-3">
+                        <button class="btn btn-secondary" id="export-btn"><i class="ph ph-download-simple"></i> Export
+                            CSV</button>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <!-- Advanced Filters Panel -->
+                    <div class="panel-header" style="flex-wrap: wrap; gap: 16px;">
+                        <div style="display: flex; gap: 12px; flex-wrap: wrap; flex: 1;">
+                            <div style="position: relative; max-width: 300px; flex: 1;">
+                                <i class="ph ph-magnifying-glass text-muted"
+                                    style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%);"></i>
+                                <input type="text" id="search-input" class="form-control"
+                                    placeholder="Search by email, name, or last4..." style="padding-left: 36px;">
+                            </div>
+                            <select id="status-filter" class="form-control" style="width: 160px;">
+                                <option value="">All Statuses</option>
+                                <option value="succeeded">Succeeded</option>
+                                <option value="canceled">Canceled / Failed</option>
+                                <option value="requires_payment_method">Requires Payment</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Customer / Method</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                    <th class="text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="transactions-tbody">
+                                <!-- Loading skeletons -->
+                                <tr>
+                                    <td colspan="5">
+                                        <div class="skeleton skeleton-text" style="height: 40px; margin: 10px 0;"></div>
+                                        <div class="skeleton skeleton-text" style="height: 40px; margin: 10px 0;"></div>
+                                        <div class="skeleton skeleton-text" style="height: 40px; margin: 10px 0;"></div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Details Modal -->
+    <div id="details-modal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="flex-between">
+                <h2 class="panel-title" style="margin: 0; display: flex; align-items: center; gap: 8px;">
+                    <i class="ph ph-receipt text-primary"></i> Payment Details
+                </h2>
+                <button class="btn-icon" onclick="App.closeModal('details-modal')"><i class="ph ph-x"></i></button>
+            </div>
+
+            <div style="margin-top: 24px;">
+                <div class="tabs" id="tx-tabs">
+                    <span class="tab-item active" data-target="tx-overview">Overview</span>
+                    <span class="tab-item" data-target="tx-fees">Breakdown</span>
+                    <span class="tab-item" data-target="tx-json">Raw JSON</span>
+                </div>
+
+                <div id="tx-tabs-container">
+                    <!-- Overview Tab -->
+                    <div id="tx-overview" class="tab-content active">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+                            <div
+                                style="background: var(--bg-main); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+                                <div class="text-muted" style="font-size: 0.8rem; text-transform: uppercase;">Amount
+                                </div>
+                                <div id="detail-amount" style="font-size: 1.5rem; font-weight: 700; margin-top: 4px;">
+                                </div>
+                                <div id="detail-status" style="margin-top: 8px;"></div>
+                            </div>
+                            <div
+                                style="background: var(--bg-main); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+                                <div class="text-muted" style="font-size: 0.8rem; text-transform: uppercase;">Customer
+                                </div>
+                                <div id="detail-customer" style="font-size: 1.1rem; font-weight: 600; margin-top: 4px;">
+                                </div>
+                                <div id="detail-email" class="text-muted" style="font-size: 0.9rem;"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-group row" style="display: flex; gap: 12px; align-items: center;">
+                            <label class="form-label" style="margin: 0; width: 120px;">Transaction ID</label>
+                            <code class="inline-code" id="detail-id"></code>
+                            <button class="btn-icon" id="copy-id-btn" title="Copy"><i class="ph ph-copy"></i></button>
+                        </div>
+                        <div class="form-group row" style="display: flex; gap: 12px; align-items: center;">
+                            <label class="form-label" style="margin: 0; width: 120px;">Date</label>
+                            <span id="detail-date" style="font-weight: 500;"></span>
+                        </div>
+                        <div class="form-group row" style="display: flex; gap: 12px; align-items: center;">
+                            <label class="form-label" style="margin: 0; width: 120px;">Payment Method</label>
+                            <span id="detail-method"
+                                style="font-weight: 500; display: flex; align-items: center; gap: 8px;"></span>
+                        </div>
+                        <div class="form-group row" style="display: flex; gap: 12px; align-items: flex-start;">
+                            <label class="form-label"
+                                style="margin: 0; width: 120px; padding-top: 4px;">Metadata</label>
+                            <div id="detail-meta"
+                                style="flex: 1; background: var(--bg-main); border-radius: var(--radius-sm); padding: 12px; border: 1px solid var(--border-color); font-family: monospace; font-size: 0.8rem; white-space: pre-wrap; word-break: break-all;">
+                            </div>
+                        </div>
+
+                        <div
+                            style="margin-top: 32px; display: flex; gap: 12px; justify-content: flex-end; border-top: 1px solid var(--border-color); padding-top: 24px;">
+                            <button class="btn btn-secondary" onclick="App.closeModal('details-modal')">Close</button>
+                            <button class="btn btn-primary" id="modal-refund-btn" style="background: var(--danger);"><i
+                                    class="ph ph-arrow-u-down-left"></i> Issue Refund</button>
+                        </div>
+                    </div>
+
+                    <!-- Fees Tab -->
+                    <div id="tx-fees" class="tab-content">
+                        <div
+                            style="background: var(--bg-main); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                                <span class="text-muted">Gross Amount</span>
+                                <span id="fee-gross" style="font-weight: 600;"></span>
+                            </div>
+                            <div
+                                style="display: flex; justify-content: space-between; margin-bottom: 12px; color: var(--danger);">
+                                <span>Est. Stripe Fee (2.9% + 30¢)</span>
+                                <span id="fee-est"></span>
+                            </div>
+                            <div style="border-top: 1px dashed var(--border-color); margin: 16px 0;"></div>
+                            <div
+                                style="display: flex; justify-content: space-between; font-size: 1.1rem; font-weight: 700;">
+                                <span>Estimated Net</span>
+                                <span id="fee-net" class="text-success"></span>
+                            </div>
+                            <p class="text-muted" style="font-size: 0.75rem; margin-top: 16px;">
+                                * Stripe fees are estimated for domestic US cards. Actual fees may vary based on
+                                international cards or exact pricing plans. Fetching actual balance transactions
+                                requires an expanded API scope not implemented by default here to save latency.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- JSON Tab -->
+                    <div id="tx-json" class="tab-content">
+                        <pre id="json-viewer"
+                            style="background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: var(--radius-md); overflow-x: auto; font-family: Consolas, monospace; font-size: 0.85rem; max-height: 400px; overflow-y: auto;"></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Refund Modal -->
+    <div id="refund-modal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 450px;">
+            <div class="flex-between">
+                <h2 class="panel-title" style="margin: 0;">Issue Refund</h2>
+                <button class="btn-icon" onclick="App.closeModal('refund-modal')"><i class="ph ph-x"></i></button>
+            </div>
+
+            <div style="margin-top: 24px;">
+                <p>Are you sure you want to refund this payment?</p>
+                <div
+                    style="background-color: var(--bg-main); padding: 16px; border-radius: var(--radius-md); margin-top: 16px; text-align: center; border: 1px solid var(--border-color);">
+                    <div class="text-muted" style="font-size: 0.85rem; margin-bottom: 4px;">Refund Amount</div>
+                    <div id="refund-amount-display" style="font-size: 2rem; font-weight: 700; color: var(--danger);">
+                    </div>
+                </div>
+
+                <input type="hidden" id="refund-pi-id">
+
+                <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
+                    <button class="btn btn-secondary" onclick="App.closeModal('refund-modal')">Cancel</button>
+                    <button class="btn btn-primary" id="confirm-refund-btn"
+                        style="background-color: var(--danger);">Confirm Refund</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="assets/app.js"></script>
+    <script src="assets/transactions.js"></script>
+</body>
+
+</html>
