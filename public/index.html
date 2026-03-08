@@ -40,10 +40,6 @@
                 <a href="analytics.html" class="nav-item" data-tooltip="Analytics"><i class="ph ph-chart-line-up"></i>
                     <span>Analytics</span></a>
             </nav>
-            <div class="sidebar-footer">
-                <a href="settings.html" class="nav-item" data-tooltip="Settings"><i class="ph ph-gear"></i>
-                    <span>Settings</span></a>
-            </div>
         </aside>
 
         <!-- Main Content -->
@@ -70,8 +66,16 @@
 
                     <div style="height: 32px; width: 1px; background: var(--border-color); margin: 0 8px;"></div>
 
-                    <div style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
-                        <div class="avatar avatar-sm">A</div>
+                    <div style="display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 4px 8px; border-radius: var(--radius-md); transition: background-color var(--transition);" onmouseover="this.style.backgroundColor='var(--bg-surface-hover)'" onmouseout="this.style.backgroundColor='transparent'">
+                        <div class="avatar avatar-sm" style="overflow: hidden; border: 1px solid var(--border-color); background: var(--bg-surface);">
+                            <img src="assets/favicon.png" alt="Profile" style="width: 100%; height: 100%; object-fit: contain; padding: 4px;">
+                        </div>
+                        <div style="display: flex; flex-direction: column;">
+                            <span id="user-name-display" style="font-size: 0.85rem; font-weight: 600;">Admin</span>
+                            <span class="text-muted" style="font-size: 0.75rem;">Owner</span>
+                        </div>
+                        <i class="ph ph-caret-down text-muted" style="margin-left: 8px;"></i>
+                    </div>
                         <div style="display: flex; flex-direction: column;">
                             <span id="user-name-display" style="font-size: 0.85rem; font-weight: 600;">Admin</span>
                             <span class="text-muted" style="font-size: 0.75rem;">Owner</span>

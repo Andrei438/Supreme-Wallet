@@ -65,13 +65,13 @@ function renderCustomers() {
         const spendInfo = calculateSpend(c.id);
         const name = c.forum_name || c.name || 'Unnamed Customer';
         const email = c.email || 'No email provided';
-        const initial = name.charAt(0).toUpperCase();
-
+        const avatarHtml = c.avatar_url ? `<img src="${c.avatar_url}" class="avatar-img">` : App.getAvatarPlaceholder(name);
+        
         html += `
             <tr style="cursor: pointer;" onclick="openCustomerModal('${c.id}')">
                 <td>
                     <div style="display: flex; align-items: center; gap: 12px;">
-                        <div class="avatar avatar-sm">${initial}</div>
+                        <div class="avatar avatar-sm">${avatarHtml}</div>
                         <div style="display: flex; flex-direction: column;">
                             <span style="font-weight: 600;">${name}</span>
                             <span class="text-muted" style="font-size: 0.75rem;"><code class="inline-code" style="background:transparent;border:none;padding:0;">${c.id}</code></span>
@@ -98,7 +98,8 @@ function openCustomerModal(id) {
     const spendInfo = calculateSpend(c.id);
     const name = c.forum_name || c.name || 'Unnamed Customer';
 
-    document.getElementById('modal-avatar').textContent = name.charAt(0).toUpperCase();
+    const avatarHtml = c.avatar_url ? `<img src="${c.avatar_url}" class="avatar-img">` : App.getAvatarPlaceholder(name);
+    document.getElementById('modal-avatar').innerHTML = avatarHtml;
     document.getElementById('modal-name').textContent = name;
     document.getElementById('modal-email').textContent = c.email || 'No email provided';
     document.getElementById('modal-id').textContent = c.id;

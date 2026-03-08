@@ -41,6 +41,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('copy-id-btn').addEventListener('click', copyTxId);
 
     await loadTransactions();
+
+    // Deep link check
+    const urlParams = new URLSearchParams(window.location.search);
+    const txId = urlParams.get('id');
+    if (txId) {
+        // Find in data, but if not yet loaded we might need to wait or fetch specifically
+        const poll = setInterval(() => {
+            if (allTransactions.length > 0) {
+                if (allTransactions.find(t => t.id === txId)) {
+                    openDetailsModal(txId);
+                }
+                clearInterval(poll);
+            }
+        }, 100);
+        setTimeout(() => clearInterval(poll), 3000); // safety
+    }
 });
 
 async function loadTransactions() {
