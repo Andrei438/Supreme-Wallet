@@ -217,8 +217,8 @@ async function loadRecentActivity() {
                 
                 html += `
                     <div style="display: flex; gap: 12px; position: relative; z-index: 1; margin-bottom: 20px;">
-                        <div class="avatar avatar-xs" style="flex-shrink: 0; border: 2px solid var(--bg-surface); overflow: hidden;">
-                            ${p.avatar_url ? `<img src="${p.avatar_url}" class="avatar-img" style="width:100%; height:100%; object-fit:cover;">` : App.getAvatarPlaceholder(name)}
+                        <div class="avatar avatar-xs" style="border: 2px solid var(--bg-surface);">
+                            ${p.avatar_url ? `<img src="${p.avatar_url}" class="avatar-img">` : App.getAvatarPlaceholder(name)}
                         </div>
                         <div style="display: flex; flex-direction: column; gap: 2px;">
                             <div style="font-size: 0.85rem; color: var(--text-main);">
