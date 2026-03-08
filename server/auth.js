@@ -45,19 +45,29 @@ function initAuth() {
 initAuth();
 
 // Middleware to check if user is authenticated
-function isAuthenticated(req, res, next) {
+async function isAuthenticated(req, res, next) {
     if (req.session && req.session.authenticated) {
+        // Renew session TTL on activity (rolling session)
+        // Express-session with 'rolling: true' handles the cookie, 
+        // but we ensure the session object is touched.
+        req.session._lastActivity = Date.now();
         return next();
     }
 
     // Check if it's an API route or page load
-    if (req.path.startsWith('/api/') && req.path !== '/api/login') {
+    const isApiRequest = req.path.startsWith('/api/') || req.headers['accept']?.includes('application/json');
+    
+    if (isApiRequest && req.path !== '/api/login') {
         return res.status(401).json({ error: 'Unauthorized. Please log in.' });
     }
 
-    // Redirect to login for page loads
+    // Redirect to login for page loads (303 See Other is more explicit for redirects)
     const base = config.basePath || '';
-    res.redirect(`${base}/login.html`);
+    if (!req.path.endsWith('login.html')) {
+        return res.status(303).redirect(`${base}/login.html`);
+    }
+    
+    next();
 }
 
 // Controller for login

@@ -51,6 +51,7 @@ app.use(session({
     secret: config.sessionSecret,
     resave: false,
     saveUninitialized: false,
+    rolling: true, // Force session cookie to be set on every response, resetting the expiration
     cookie: {
         secure: config.nodeEnv === 'production' && process.env.ALLOW_HTTP_SESSION !== 'true',
         httpOnly: true,
@@ -81,27 +82,28 @@ const loginLimiter = rateLimit({
 // Apply login limiter
 app.use(`${BASE}/api/login`, loginLimiter);
 
+// Apply global auth middleware to all routes under BASE (except public ones)
+app.use(BASE, (req, res, next) => {
+    // Public paths that don't need auth
+    const publicPaths = ['/api/login', '/login.html', '/health', '/api/session'];
+    const isPublic = publicPaths.some(p => req.path === p || req.path === p + '/') || 
+                     req.path.startsWith('/assets/');
+
+    if (isPublic) return next();
+    
+    // Use the refactored isAuthenticated middleware
+    auth.isAuthenticated(req, res, next);
+});
+
 // API Routes (under /wallet/api)
 app.use(`${BASE}/api`, routes);
 
 // Static files (Frontend) - served under /wallet
 app.use(BASE, express.static(path.join(__dirname, '..', 'public')));
 
-// Protect specific HTML dashboard pages
-const dashboardPages = [
-    '/index.html', '/transactions.html', '/customers.html',
-    '/subscriptions.html', '/invoices.html', '/balance.html',
-    '/refunds.html', '/disputes.html', '/events.html',
-    '/analytics.html', '/ledger.html', '/settings.html'
-].map(p => `${BASE}${p}`);
-
-app.get(dashboardPages, auth.isAuthenticated, (req, res, next) => {
-    next();
-});
-
 // Root redirect to base path
 app.get('/', (req, res) => {
-    res.redirect(BASE || '/wallet');
+    res.redirect(301, BASE || '/wallet');
 });
 
 // /wallet redirect to login or dashboard

@@ -101,12 +101,6 @@ const App = {
     },
 
     setupUI: () => {
-        // Theme Toggle
-        const themeBtn = document.getElementById('theme-toggle');
-        if (themeBtn) {
-            themeBtn.addEventListener('click', App.toggleTheme);
-        }
-
         // Sidebar Toggle Desktop
         const sidebarToggleBtn = document.getElementById('sidebar-toggle');
         if (sidebarToggleBtn) {

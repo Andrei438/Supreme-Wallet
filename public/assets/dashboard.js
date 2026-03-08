@@ -102,7 +102,6 @@ async function loadDashboardData() {
                     <div class="metric-icon primary"><i class="ph ph-currency-dollar"></i></div>
                 </div>
                 <div class="metric-value" id="count-rev">$0.00</div>
-                <div class="metric-trend trend-up"><div class="badge badge-success" style="padding: 2px 8px;"><i class="ph ph-trend-up"></i> +12%</div> vs last month</div>
             </a>
 
             <a href="refunds.html" class="metric-card clickable">
@@ -111,7 +110,6 @@ async function loadDashboardData() {
                     <div class="metric-icon danger"><i class="ph ph-arrow-u-down-left"></i></div>
                 </div>
                 <div class="metric-value" id="count-fails">0</div>
-                <div class="metric-trend trend-down" style="color: var(--danger); font-weight: 600;">Requires attention</div>
             </a>
 
             <a href="balance.html" class="metric-card clickable">
@@ -120,7 +118,6 @@ async function loadDashboardData() {
                     <div class="metric-icon success"><i class="ph ph-bank"></i></div>
                 </div>
                 <div class="metric-value" id="count-avail">$0.00</div>
-                <div class="metric-trend trend-up"><div class="badge badge-success" style="padding: 2px 8px;"><i class="ph ph-trend-up"></i> Ready</div> for payout</div>
             </a>
 
             <a href="balance.html" class="metric-card clickable">
@@ -129,7 +126,6 @@ async function loadDashboardData() {
                     <div class="metric-icon warning"><i class="ph ph-clock"></i></div>
                 </div>
                 <div class="metric-value" id="count-pend">$0.00</div>
-                <div class="metric-trend trend-neutral">Processing by Stripe</div>
             </a>
         `;
 
