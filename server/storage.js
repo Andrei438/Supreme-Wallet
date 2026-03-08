@@ -47,11 +47,15 @@ async function readJsonFile(filePath) {
             const decrypted = cryptoUtils.decrypt(rawData);
             return JSON.parse(decrypted);
         } catch (decryptErr) {
-            console.warn(`[Storage] Could not read ${path.basename(filePath)}, resetting to empty.`);
-            return [];
+            // CRITICAL: Do NOT reset the file to [] if decryption fails.
+            // This preserves the file so the user can fix their ENCRYPTION_KEY.
+            console.error(`[Storage] FATAL: Could not decrypt ${path.basename(filePath)}. Check your ENCRYPTION_KEY!`);
+            throw new Error(`Data integrity error in ${path.basename(filePath)}. Decryption failed.`);
         }
     } catch (error) {
         if (error.code === 'ENOENT') return [];
+        // Log error but don't return [] if it's a decryption error (caught above)
+        console.error(`[Storage] Error reading ${path.basename(filePath)}:`, error.message);
         throw error;
     }
 }

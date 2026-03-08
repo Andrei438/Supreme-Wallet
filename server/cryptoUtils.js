@@ -45,8 +45,8 @@ function decrypt(cipherText) {
 
         return decipher.update(encrypted) + decipher.final('utf8');
     } catch (err) {
-        console.error('[Crypto] Decryption failed. Data might be corrupted or key is wrong.', err);
-        return cipherText; // Fallback to raw if decryption fails (might be unencrypted)
+        console.error('[Crypto] Decryption failed. Data might be corrupted or key is wrong.', err.message);
+        throw err; // Rethrow to allow caller to handle data integrity issues
     }
 }
 

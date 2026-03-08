@@ -27,7 +27,8 @@ async function getUserInfoByEmail(email) {
         if (cached) return JSON.parse(cached);
 
         // 2. Fetch from XenForo API
-        const url = new URL(`${config.xenforoApiUrl}/api/users/find`);
+        // Standard XF2 user search via filtering
+        const url = new URL(`${config.xenforoApiUrl}/api/users/`);
         url.searchParams.append('email', email);
 
         const response = await fetch(url.toString(), {
@@ -37,31 +38,51 @@ async function getUserInfoByEmail(email) {
 
         if (!response.ok) {
             const errBody = await response.text();
+            
+            // Fallback: Some setups might still use /find if an addon is present
+            if (response.status === 404) {
+                const findUrl = new URL(`${config.xenforoApiUrl}/api/users/find`);
+                findUrl.searchParams.append('email', email);
+                const findRes = await fetch(findUrl.toString(), {
+                    headers: { 'XF-Api-Key': config.xenforoApiKey },
+                    signal: AbortSignal.timeout(5000)
+                });
+                if (findRes.ok) {
+                    const findData = await findRes.json();
+                    return handleUserResponse(findData.user, cacheKey, redis);
+                }
+            }
             throw new Error(`API returned ${response.status}: ${errBody}`);
         }
         
         const data = await response.json();
-        const user = data?.user;
+        // /api/users/ returns a list of results { users: [...], pagination: ... }
+        const user = data?.users?.[0] || data?.user;
         
-        if (!user) {
-            await redis.set(cacheKey, JSON.stringify({ error: 'UNKNOWN' }), { EX: 3600 });
-            return null;
-        }
-
-        const userInfo = {
-            username: user.username,
-            avatar_url: user.avatar_urls?.o || user.avatar_urls?.h || user.avatar_urls?.m || user.avatar_urls?.s || null,
-            user_id: user.user_id
-        };
-
-        // 3. Cache Result (24 hrs)
-        await redis.set(cacheKey, JSON.stringify(userInfo), { EX: 86400 });
-
-        return userInfo;
+        return handleUserResponse(user, cacheKey, redis);
     } catch (error) {
         console.error(`[XenForo Service] Lookup failed for ${email}:`, error.message);
         return null;
     }
+}
+
+async function handleUserResponse(user, cacheKey, redis) {
+    if (!user) {
+        await redis.set(cacheKey, JSON.stringify({ error: 'UNKNOWN' }), { EX: 3600 });
+        return null;
+    }
+
+    const userInfo = {
+        username: user.username,
+        // Match main server logic: o > h > m > s falling back to anonymous
+        avatar_url: user.avatar_urls?.o || user.avatar_urls?.h || user.avatar_urls?.m || user.avatar_urls?.s || "https://supreme-cheats.xyz/anonymus.png",
+        user_id: user.user_id
+    };
+
+    // 3. Cache Result (24 hrs)
+    await redis.set(cacheKey, JSON.stringify(userInfo), { EX: 86400 });
+
+    return userInfo;
 }
 
 module.exports = {
