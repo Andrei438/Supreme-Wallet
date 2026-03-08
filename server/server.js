@@ -35,7 +35,7 @@ app.use(express.json());
 
 // Redis Session Store Setup
 const { createClient } = require('redis');
-const RedisStore = require('connect-redis').default;
+const { RedisStore } = require('connect-redis');
 
 const redisClient = createClient({ url: config.redisUrl });
 redisClient.connect().catch(err => console.error('[Redis] Connection Error:', err));
